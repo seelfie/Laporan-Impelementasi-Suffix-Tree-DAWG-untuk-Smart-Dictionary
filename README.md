@@ -37,11 +37,14 @@ Hafara Firdausi, S. Kom, M.Kom
 ---
 
 ## 1. Problem Statement / Permasalahan
+
 #### 1.1 Latar Belakang
+
 Di era digital saat ini, aplikasi kamus modern (modern dictionary) dituntut untuk memberikan respons pencarian yang instan dan interaktif kepada penggunanya. Salah satu fitur esensial yang menjadi standar aplikasi modern adalah autocomplete dan pencarian potongan kata, yang sangat bergantung pada kemampuan komputasi dalam melakukan substring searching. <br>
 Seiring dengan bertambah besarnya volume pangkalan data kosa kata, efisiensi pencarian data menggunakan metode sekuensial konvensional (seperti Linear Search) menjadi tidak relevan karena membutuhkan waktu yang berbanding lurus dengan jumlah data (O(N)). <br> Hal ini memicu terjadinya bottleneck atau perlambatan performa aplikasi. Oleh karena itu, diperlukan pendekatan yang lebih mutakhir melalui penggunaan struktur data tingkat lanjut berbasis pohon (tree structure) dan graf automata, seperti Suffix Tree dan DAWG (Directed Acyclic Word Graph). Struktur data ini mampu mereduksi kompleksitas waktu pencarian secara drastis, sehingga pencarian kata murni hanya bergantung pada panjang karakter yang dicari, bukan jumlah kata di dalam kamus.
 
 #### 1.2 Rumusan Masalah
+
 Berdasarkan latar belakang di atas, rumusan masalah dalam proyek ini adalah sebagai berikut:
 - Bagaimana cara mengimplementasikan struktur data Suffix Tree murni dari awal untuk pencarian teks?
 - Bagaimana cara mengimplementasikan struktur data DAWG (Directed Acyclic Word Graph) sebagai bentuk minimalisasi dari Suffix Tree?
@@ -111,11 +114,11 @@ Traversal dilakukan dengan berpindah dari parent node menuju child node berdasar
 ##### Cara Kerja
 
 Suffix Tree bekerja dengan memasukkan seluruh suffix dari suatu string ke dalam tree. Sebagai contoh, apabila diberikan string: <br>
-
+```
 teknologi
-
+```
 maka suffix yang dihasilkan:
-
+```
 teknologi
 eknologi
 knologi
@@ -125,62 +128,63 @@ logi
 ogi
 gi
 i
-
+```
 Seluruh suffix tersebut akan dimasukkan ke dalam tree sehingga substring dapat dicari menggunakan traversal karakter.
 
 Pada implementasi program, proses build tree dilakukan menggunakan method:
-
+```java
 public void buildTree(String text)
-
+```
 dengan proses pembentukan suffix:
-
+```java
 String suffix = text.substring(i);
-
+```
 Setelah suffix diperoleh, program akan memasukkannya ke dalam tree menggunakan:
-
+```java
 insertSuffix(suffix);
-
+```
 Pada program utama (Main.java), tree dibangun menggunakan:
-
+```java
 SuffixTree tree = new SuffixTree();
 tree.buildTree(text);
-
+```
 Text yang digunakan pada implementasi program adalah:
-
+```text
 String text = "teknologi informasi information technology cyber security internet of things integration system smart city";
-
+```
 Dengan demikian, seluruh substring dari text tersebut dapat dikenali oleh Suffix Tree.
 
 ##### Algoritma Insertion
 Proses insertion dilakukan dengan memasukkan karakter dari setiap suffix satu per satu ke dalam tree. Pendekatan ini memungkinkan seluruh suffix string tersimpan secara eksplisit sehingga substring dapat dicari melalui traversal karakter.
 
 Pada implementasi program, insertion dilakukan menggunakan method:
-
+```java
 public void insertSuffix(String suffix)
-
+```
 Traversal karakter dilakukan menggunakan perulangan:
+```java
 for (int i = 0; i < suffix.length(); i++)
-
+```
 Setiap karakter diambil menggunakan:
-
+```java
 char ch = suffix.charAt(i);
-
+```
 Kemudian program memeriksa apakah child node dengan karakter tersebut sudah tersedia:
-
+```java
 if (!current.children.containsKey(ch))
-
+```
 Apabila child node belum tersedia, maka program akan membuat node baru menggunakan:
-
+```java
 current.children.put(ch, new TreeNode(ch));
-
+```
 Setelah node ditemukan atau berhasil dibuat, traversal akan berpindah ke child node berikutnya menggunakan:
-
+```java
 current = current.children.get(ch);
-
+```
 Setelah seluruh karakter pada suffix berhasil dimasukkan ke dalam tree, node terakhir akan ditandai sebagai akhir suffix menggunakan:
-
+```java
 current.isEnd = true;
-
+```
 Pendekatan insertion tersebut memungkinkan seluruh suffix tersimpan secara sistematis dalam struktur tree sehingga proses substring searching dapat dilakukan dengan lebih efisien dibandingkan pencarian linear biasa.
 
 Menurut Gusfield (1997), penyimpanan seluruh suffix dalam struktur tree memungkinkan proses traversal substring dilakukan secara cepat karena pencarian cukup mengikuti jalur karakter yang sesuai pada tree.
@@ -189,33 +193,33 @@ Menurut Gusfield (1997), penyimpanan seluruh suffix dalam struktur tree memungki
 Pencarian substring dilakukan menggunakan traversal karakter dari root menuju child node berdasarkan pattern yang dicari.
 
 Pada implementasi program, proses search dilakukan menggunakan method:
-
+```java
 public boolean search(String pattern)
-
+```
 Traversal dilakukan menggunakan:
-
+```java
 char ch = pattern.charAt(i);
-
+```
 Kemudian program memeriksa keberadaan child node:
-
+```java
 if (!current.children.containsKey(ch)) {
     return false;
 }
-
+```
 Apabila seluruh karakter berhasil ditelusuri, maka substring dianggap ditemukan.
 
 Pada program utama (Main.java), substring yang ditemukan akan ditampilkan bersama kata yang mengandung substring tersebut:
-
+```java
 if (word.contains(pattern)) {
     System.out.println("- " + word);
 }
-
+```
 Sebagai contoh:
-
+```
 Input  : log
 Output :
 - teknologi
-
+```
 
 ##### Kompleksitas
 
@@ -226,8 +230,8 @@ Output :
 
 Keterangan:
 
-- n merupakan panjang text.
-= m merupakan panjang pattern.
+- `n` merupakan panjang text.
+- `m` merupakan panjang pattern.
 
 Kompleksitas build tree bersifat O(n²) karena seluruh suffix string dimasukkan satu per satu ke dalam tree. Sedangkan proses pencarian substring memiliki kompleksitas O(m) karena traversal hanya dilakukan sepanjang pattern.
 
@@ -241,13 +245,13 @@ Directed Acyclic Word Graph (DAWG) merupakan struktur graph berbasis automata ya
 Menurut Fujishige dkk. (2023), DAWG merupakan minimal automata yang mampu merepresentasikan substring dengan kompleksitas ruang linear.
 
 Pada implementasi program ini, DAWG dibangun menggunakan pendekatan suffix automaton melalui class:
-
+```java
 public class DAWG
-
+```
 dengan state direpresentasikan menggunakan:
-
+```java
 public class State
-
+```
 ##### Konsep Automata
 
 DAWG terdiri atas beberapa komponen utama:
@@ -260,12 +264,12 @@ DAWG terdiri atas beberapa komponen utama:
 | Clone State | State hasil minimization |
 
 State pada implementasi program memiliki atribut sebagai berikut:
-
+```java
 public int len;
 public int link;
 public int[] next;
 public boolean isClone;
-
+```
 Keterangan atribut:
 1. len digunakan untuk menyimpan panjang substring maksimum yang direpresentasikan state.
 2. link merupakan suffix link menuju state sebelumnya.
@@ -276,11 +280,11 @@ Keterangan atribut:
 Salah satu keunggulan utama DAWG adalah proses minimisasi state. State yang memiliki transition identik dapat digabung sehingga penggunaan memori menjadi lebih efisien dibandingkan suffix trie biasa.
 
 Pada implementasi program, clone state dibuat menggunakan kode berikut:
-
+```java
 int clone = newState(pool[p].len + 1, pool[q].link);
 pool[clone].copyTransitionsFrom(pool[q]);
 pool[clone].isClone = true;
-
+```
 
 ##### Hubungan dengan Suffix Tree
 
@@ -298,17 +302,17 @@ Suffix Tree melakukan penyimpanan seluruh suffix secara eksplisit dalam bentuk t
 ##### Search Recognition
 
 Pencarian substring pada DAWG dilakukan menggunakan traversal transition antar state melalui method:
-
+```java
 public boolean contains(String pattern)
-
+```
 Traversal dilakukan menggunakan:
-
+```java
 int nxt = pool[cur].get(pattern.charAt(i));
-
+```
 Apabila transition tidak ditemukan:
-
+```java
 if (nxt == -1) return false;
-
+```
 maka substring dianggap tidak terdapat pada automata.
 
 ##### Kompleksitas
@@ -322,7 +326,7 @@ maka substring dianggap tidak terdapat pada automata.
 
 Bab ini membahas visualisasi dua struktur data utama yang diimplementasikan dalam program, yaitu Suffix Tree dan Directed Acyclic Word Graph (DAWG). Kedua struktur digunakan untuk operasi pencarian substring secara efisien.
 
-#### 3.1 Diagram Suffix Tree
+### 3.1 Diagram Suffix Tree
 Suffix Tree diimplementasikan dalam SuffixTree.java dan TreeNode.java. Setiap node menyimpan satu karakter, dan setiap suffix dari string input dimasukkan dari root dengan memanggil insertSuffix(). Pencarian dilakukan dengan menelusuri karakter demi karakter dari root.
 Suffix yang dibentuk:
 
@@ -410,14 +414,15 @@ Prinsip kerja search(): karakter pattern ditelusuri satu per satu dari root. Jik
 
 | Pattern | Hasil Search | Keterangan |
 |----------|--------------|-------------|
-| `tekno` | ✅ FOUND | `"tekno"` ditemukan sebagai substring dalam `"teknologi"` |
-| `nologi` | ✅ FOUND | `"nologi"` ditemukan sebagai substring dalam `"teknologi"` |
-| `ogi` | ✅ FOUND | `"ogi"` ditemukan sebagai substring dalam `"teknologi"` |
-| `olo` | ✅ FOUND | `"olo"` ditemukan sebagai substring dalam `"teknologi"` |
-| `xyz` | ❌ NOT FOUND | `"xyz"` tidak ada pada suffix tree |
-| `log` | ✅ FOUND | `"log"` ditemukan sebagai substring dalam `"teknologi"` |
-| `tek` | ✅ FOUND | `"tek"` ditemukan sebagai substring dalam `"teknologi"` |
-| `gi` | ✅ FOUND | `"gi"` ditemukan sebagai substring dalam `"teknologi"` |
+| `tekno` |  FOUND | `"tekno"` ditemukan sebagai substring dalam `"teknologi"` |
+| `nologi` |  FOUND | `"nologi"` ditemukan sebagai substring dalam `"teknologi"` |
+| `ogi` |  FOUND | `"ogi"` ditemukan sebagai substring dalam `"teknologi"` |
+| `olo` |  FOUND | `"olo"` ditemukan sebagai substring dalam `"teknologi"` |
+| `xyz` |  NOT FOUND | `"xyz"` tidak ada pada suffix tree |
+| `log` |  FOUND | `"log"` ditemukan sebagai substring dalam `"teknologi"` |
+| `tek` |  FOUND | `"tek"` ditemukan sebagai substring dalam `"teknologi"` |
+| `gi` |  FOUND | `"gi"` ditemukan sebagai substring dalam `"teknologi"` |
+
 
 ---
 
@@ -458,28 +463,42 @@ Graph automata berikut menggambarkan secara visual alur transisi antar state DAW
 
 String input: "tekno" menghasilkan jalur linear karena setiap karakter unik, sehingga tidak terjadi clone state. Pada string yang lebih kompleks (karakter berulang), DAWG akan memiliki state yang berbagi suffix link dan clone state akan muncul.
 
-```text
-Representasi ASCII Graph Automata DAWG (string: "tekno")
-────────────────────────────────────────────────────────
+```mermaid
+flowchart LR
 
-[START]                                   [ACCEPT]
+    %% Labels
+    START([START])
+    ACCEPT([ACCEPT])
 
-(q0) ──t──> (q1) ──e──> (q2) ──k──> (q3) ──n──> (q4) ──o──> ((q5))
-  │             │             │             │             │
-  └<────────────┘             │             │             │
-  └<──────────────────────────┘             │             │
-  └<────────────────────────────────────────┘             │
-  └<──────────────────────────────────────────────────────┘
-```
+    %% States
+    q0((q0))
+    q1((q1))
+    q2((q2))
+    q3((q3))
+    q4((q4))
+    q5(((q5)))
 
-Keterangan
+    %% Main transitions
+    q0 -- t --> q1
+    q1 -- e --> q2
+    q2 -- k --> q3
+    q3 -- n --> q4
+    q4 -- o --> q5
 
-```text
-(qN)    = state internal
-((q5))  = accept state (double parenthesis)
+    %% Suffix links
+    q1 -. suffix .-> q0
+    q2 -. suffix .-> q0
+    q3 -. suffix .-> q0
+    q4 -. suffix .-> q0
+    q5 -. suffix .-> q0
 
-──c──>  = transisi dengan karakter c
-<──     = suffix link kembali ke q0
+    %% Label connections
+    START --> q0
+    q5 --> ACCEPT
+
+    class q0 start;
+    class q5 accept;
+    class q1,q2,q3,q4 normal;
 ```
 
 ---
@@ -570,7 +589,6 @@ dengan:
 - `m` = jumlah karakter pattern yang dicari
 
 
-
 Diagram Alur Program
 
 Diagram berikut menunjukkan alur utama program pencarian substring menggunakan struktur data **Suffix Tree** dan **DAWG**.
@@ -579,55 +597,44 @@ Diagram berikut menunjukkan alur utama program pencarian substring menggunakan s
 
 Diagram Alur Umum
 
-```text
-+------------------+
-|      START       |
-+------------------+
-          |
-          v
-+------------------+
-|   Input String   |
-| contoh: "tekno"  |
-+------------------+
-          |
-          v
-+---------------------------+
-| Build Data Structure      |
-| - Suffix Tree             |
-| - DAWG / Suffix Automaton |
-+---------------------------+
-          |
-          v
-+------------------+
-| Input Pattern    |
-| contoh: "tek"    |
-+------------------+
-          |
-          v
-+------------------+
-| Process Search   |
-| Traversal Node / |
-| State Transition |
-+------------------+
-          |
-          v
-+---------------------------+
-| Pattern Found ?           |
-+---------------------------+
-      |               |
-     YES             NO
-      |               |
-      v               v
-+-------------+   +-------------+
-| OUTPUT      |   | OUTPUT      |
-| FOUND ✓     |   | NOT FOUND ✗ |
-+-------------+   +-------------+
-      \               /
-       \             /
-        v           v
-      +------------------+
-      |       END        |
-      +------------------+
+```mermaid
+flowchart TD
+
+    A([START])
+
+    B["Input String<br/>contoh: 'tekno'"]
+
+    C["Build Data Structure<br/>- Suffix Tree<br/>- DAWG / Suffix Automaton"]
+
+    D["Input Pattern<br/>contoh: 'tek'"]
+
+    E["Process Search<br/>Traversal Node /<br/>State Transition"]
+
+    F{"Pattern Found?"}
+
+    G["OUTPUT<br/>FOUND ✓"]
+
+    H["OUTPUT<br/>NOT FOUND ✗"]
+
+    I([END])
+
+    %% Flow
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    E --> F
+
+    F -- YES --> G
+    F -- NO --> H
+
+    G --> I
+    H --> I
+
+    class A,I startend
+    class B,C,D,E process
+    class F decision
+    class G,H output
 ```
 
 ---
@@ -705,33 +712,18 @@ Program menampilkan hasil:
 
 ---
 
+Kompleksitas Pencarian
 
-#### 3.2 Diagram DAWG
+Baik Suffix Tree maupun DAWG memiliki kompleksitas pencarian:
 
-Isi:
-
-* state transition
-* graph automata
-
-Contoh:
-
-```txt id="6h2k0w"
-(q0) --t--> (q1)
+```text
+O(m)
 ```
 
-#### 3.3 Diagram Alur Program
+dengan:
 
-Contoh:
+- `m` = panjang pattern yang dicari 
 
-```txt id="g6jnyu"
-Input
- ↓
-Build Structure
- ↓
-Search
- ↓
-Output
-```
 
 ## 4. Aplikasi / Implementasi
 
@@ -792,23 +784,177 @@ Selesai
 
 ## 5. Keunggulan
 
-Dikerjakan oleh: Julian
+### 5.1 Keunggulan Suffix Tree
 
-#### 5.1 Keunggulan Suffix Tree
+#### Keunggulan Suffix Tree Secara Umum
 
-Isi:
+Suffix Tree adalah struktur data berbentuk pohon yang menyimpan semua suffix dari sebuah string. Secara umum, Suffix Tree memiliki keunggulan sebagai berikut:
 
-* search cepat
-* traversal sederhana
-* substring searching efisien
+- **Search cepat** — Pencarian substring dapat dilakukan dalam waktu O(m) di mana m adalah panjang pattern, terlepas dari panjang teks yang disimpan.
+- **Traversal sederhana** — Struktur pohon memudahkan traversal dan navigasi antar node secara hierarkis dan intuitif.
+- **Substring searching efisien** — Karena semua suffix teks tersimpan dalam pohon, pencarian substring manapun cukup dilakukan dengan menelusuri cabang pohon dari root.
 
-#### 5.2 Keunggulan DAWG
+#### Keunggulan Suffix Tree Pada Code Yang Diimplementasikan
 
-Isi:
+Implementasi Suffix Tree pada project ini terdapat pada file `SuffixTree.java` dan `TreeNode.java`. Berikut keunggulan konkret yang tercermin dalam code:
 
-* hemat memori
-* state lebih sedikit
-* minimization
+#### Search Cepat — O(m) per Pencarian
+
+Metode `search()` pada `SuffixTree.java` hanya perlu menelusuri karakter per karakter dari root, tanpa perlu membandingkan seluruh dataset:
+
+```java
+public boolean search(String pattern) {
+    TreeNode current = root;
+    for (int i = 0; i < pattern.length(); i++) {
+        char ch = pattern.charAt(i);
+        if (!current.children.containsKey(ch)) {
+            return false;  
+        }
+        current = current.children.get(ch);
+    }
+    return true;
+}
+```
+
+Pencarian hanya bergantung pada panjang `pattern` (m), bukan pada ukuran teks keseluruhan — jauh lebih efisien dibandingkan linear search O(n·m).
+
+---
+
+#### Traversal Sederhana — Struktur HashMap per Node
+
+`TreeNode.java` menggunakan `HashMap<Character, TreeNode>` sebagai struktur children, sehingga traversal antar node menjadi langsung dan natural:
+
+```java
+public class TreeNode {
+    char character;
+    HashMap<Character, TreeNode> children;
+    boolean isEnd;
+
+    public TreeNode(char character) {
+        this.character = character;
+        this.children = new HashMap<>();
+        this.isEnd = false;
+    }
+}
+```
+
+Dengan HashMap, akses ke child node tertentu adalah O(1), membuat traversal pohon menjadi sangat sederhana dan tidak memerlukan iterasi linear.
+
+---
+
+#### Substring Searching Efisien karena Semua Suffix Tersimpan
+
+Metode `buildTree()` menyisipkan **setiap suffix** dari teks ke dalam pohon, sehingga semua kemungkinan substring dapat ditemukan hanya dengan satu kali traversal dari root:
+
+```java
+public void buildTree(String text) {
+    for (int i = 0; i < text.length(); i++) {
+        String suffix = text.substring(i);
+        insertSuffix(suffix);  
+    }
+}
+```
+
+Sebagai contoh, jika teks adalah `"teknologi"`, maka suffix yang disimpan meliputi `"teknologi"`, `"eknologi"`, `"knologi"`, ..., `"i"`. Pencarian substring `"nologi"` pun langsung berhasil tanpa harus memindai seluruh teks.
+
+---
+
+Implementasi ini juga dimanfaatkan di `Main.java` untuk mencari substring dalam kalimat panjang yang berisi beberapa frasa sekaligus:
+
+```java
+String text = "teknologi informasi information technology cyber security " +
+              "internet of things integration system smart city";
+SuffixTree tree = new SuffixTree();
+tree.buildTree(text);
+// ...
+boolean found = tree.search(pattern);
+```
+
+---
+
+### 5.2 Keunggulan DAWG
+
+#### Keunggulan DAWG Secara Umum
+
+DAWG (Directed Acyclic Word Graph) adalah struktur data yang merupakan hasil minimisasi dari Suffix Automaton. Secara umum, DAWG memiliki keunggulan sebagai berikut:
+
+- **Hemat memori** — State-state yang memiliki suffix link yang sama digabungkan (di-clone), sehingga jumlah total state jauh lebih sedikit dibandingkan Suffix Tree biasa.
+- **State lebih sedikit** — Jumlah state dijamin tidak melebihi 2n − 1 dan jumlah transisi tidak melebihi 3n − 4, di mana n adalah panjang string input.
+- **Minimization** — DAWG secara otomatis melakukan minimisasi selama proses pembangunan melalui mekanisme suffix link dan clone, menghasilkan struktur paling kompak untuk merepresentasikan seluruh substring.
+
+#### Keunggulan DAWG pada Code yang diimplementasikan
+
+Implementasi DAWG pada project ini terdapat pada file `DAWG.java` dan `State.java`. Berikut keunggulan konkret yang tercermin dalam code:
+
+#### Hemat Memori (Pool-based Allocation)
+
+`DAWG.java` tidak menggunakan alokasi objek individual per state, melainkan menggunakan array `pool` yang dapat tumbuh dinamis (doubling strategy):
+
+```java
+private int newState(int len, int link) {
+    if (size == pool.length) {
+        State[] grown = new State[pool.length * 2];  // doubling
+        for (int i = 0; i < pool.length; i++) grown[i] = pool[i];
+        pool = grown;
+    }
+    pool[size] = new State(len, link);
+    return size++;
+}
+```
+
+Pendekatan ini menghemat overhead alokasi memori yang berulang dan memastikan state tersimpan secara contigous di memori.
+
+---
+
+#### State Lebih Sedikit — Batas Teoritis Terjamin
+
+`printStates()` dalam `DAWG.java` secara eksplisit memverifikasi bahwa jumlah state dan transisi tidak melampaui batas teoritis DAWG:
+
+```java
+printfLn("  Total state      : %d  (batas teoritis <= %d)",
+         size, 2 * pool[last].len - 1);
+printfLn("  Total transisi   : %d  (batas teoritis <= %d)",
+         countTransitions(), 3 * pool[last].len - 4);
+```
+
+---
+
+#### Minimization — Clone Mechanism via Suffix Link
+
+Proses minimisasi terjadi secara otomatis dalam metode `extend()` melalui mekanisme **clone** ketika ditemukan state yang perlu dipecah untuk menjaga konsistensi suffix link:
+
+```java
+int clone = newState(pool[p].len + 1, pool[q].link);
+pool[clone].copyTransitionsFrom(pool[q]);
+pool[clone].isClone = true;  
+
+while (p != -1 && pool[p].get(c) == q) {
+    pool[p].put(c, clone);  
+    p = pool[p].link;
+}
+pool[q].link   = clone;
+pool[cur].link = clone;
+```
+
+State yang di-clone menyalin semua transisi dari state asalnya, dan seluruh pointer yang sebelumnya menuju state asal di-redirect ke clone — inilah inti dari proses minimization DAWG.
+
+---
+
+#### Perbandingan Ringkas
+
+| Aspek | Suffix Tree | DAWG |
+|---|---|---|
+| Kecepatan Search | O(m) | O(m) |
+| Penggunaan Memori | Lebih besar | Lebih hemat |
+| Jumlah State | O(n²) worst case | ≤ 2n − 1 |
+| Kompleksitas Build | O(n) | O(n) |
+| Struktur Node | HashMap per node | Array transisi flat |
+| Minimization | Tidak | Ya (otomatis) |
+
+---
+
+*Implementasi lengkap tersedia di: `SuffixTree.java`, `TreeNode.java`, `DAWG.java`, `State.java`* 
+
 
 ## 6. Kekurangan
 
@@ -826,78 +972,282 @@ Meskipun menawarkan performa pencarian yang sangat cepat, penggunaan struktur da
 
 ## 7. Perbandingan Tree Dasar dan Modifikasi Secara Teori
 
-Dikerjakan oleh: Silfi
+| Aspek | Suffix Tree | DAWG |
+|---|---|---|
+| Struktur | Tree | Automata |
+| Memori | Besar | Lebih hemat |
+| Search | Cepat | Cepat |
+| Kompleksitas | Sedang | Tinggi |
 
-| Aspek        | Suffix Tree | DAWG        |
-| ------------ | ----------- | ----------- |
-| Struktur     | Tree        | Automata    |
-| Memori       | Besar       | Lebih hemat |
-| Search       | Cepat       | Cepat       |
-| Kompleksitas | Sedang      | Tinggi      |
+### Analisis Teori
 
-#### Analisis Teori
+Suffix Tree dan DAWG sama-sama digunakan untuk melakukan substring searching secara efisien, namun keduanya memiliki pendekatan struktur data yang berbeda.
 
-Penjelasan:
+Suffix Tree menggunakan struktur tree yang menyimpan seluruh suffix string secara eksplisit. Pada implementasi program, struktur ini direpresentasikan menggunakan class:
 
-* perbedaan struktur
-* efisiensi state
-* penggunaan memori
-* traversal
+```java id="u3f8lz"
+public class SuffixTree
+```
+
+dengan node yang disimpan melalui:
+
+```java
+HashMap<Character, TreeNode> children;
+```
+
+Pendekatan tersebut membuat traversal menjadi lebih sederhana karena pencarian dilakukan langsung dari root menuju child node berdasarkan karakter input.
+
+Sebaliknya, DAWG menggunakan pendekatan automata berbentuk directed acyclic graph. Pada implementasi program, struktur ini direpresentasikan menggunakan:
+```java
+public class DAWG
+```
+dengan state automata yang disimpan pada class:
+```java
+public class State
+```
+DAWG memiliki efisiensi memori yang lebih baik karena menggunakan minimisasi state. State dengan transition identik dapat digabung sehingga redundansi substring dapat dikurangi. Pada implementasi program, proses minimisasi dilakukan melalui clone state menggunakan kode berikut:
+```java
+int clone = newState(pool[p].len + 1, pool[q].link);
+pool[clone].copyTransitionsFrom(pool[q]);
+pool[clone].isClone = true;
+```
+Menurut Fujishige dkk. (2023), jumlah maksimum state pada DAWG hanya sebesar:
+```
+2n - 1
+```
+dengan jumlah maksimum edge sebesar:
+```
+3n - 4
+```
+Hal tersebut menunjukkan bahwa DAWG memiliki penggunaan memori yang lebih efisien dibandingkan suffix trie maupun suffix tree biasa.
+
+Dari sisi traversal, Suffix Tree memiliki proses traversal yang lebih sederhana karena hanya memerlukan perpindahan node berdasarkan child character. Pada implementasi program, traversal dilakukan menggunakan:
+```java
+current = current.children.get(ch);
+```
+Sedangkan pada DAWG, traversal dilakukan melalui transition antar state menggunakan:
+```java
+int nxt = pool[cur].get(pattern.charAt(i));
+```
+Pendekatan automata pada DAWG membuat implementasinya lebih kompleks karena memerlukan suffix link dan clone state, namun memberikan efisiensi ruang yang lebih baik.
+
+Berdasarkan penelitian Faro dan Scafiti (2023), struktur berbasis suffix automata sangat efektif dalam proses string matching modern karena mampu mempertahankan kompleksitas pencarian linear terhadap panjang pattern.
 
 ## 8. Analisis Kompleksitas Berdasarkan Struktur Tree
 Struktur data Suffix Tree dan DAWG (Directed Acyclic Word Graph) merupakan fondasi utama dari performa pencarian dalam Smart Dictionary. Bagian ini akan membedah kompleksitas algoritma dari kedua struktur tersebut untuk memahami bagaimana program mampu memproses ribuan kata secara efisien.
 
 #### 8.1 Kompleksitas Suffix Tree
+
 Suffix Tree menyimpan seluruh kemungkinan sufiks (akhiran) dari sekumpulan string di dalam bentuk pohon trie yang terkompresi.
+
 - Insertion (Penyisipan): Jika dibangun menggunakan pendekatan naif, kompleksitas waktu penyisipan teks dengan panjang n adalah O(n2). Namun, pada implementasi praktis standar (seperti algoritma Ukkonen), penyisipan seluruh karakter dapat diselesaikan dalam waktu linear O(n).
 - Traversal (Penelusuran): Menelusuri seluruh node dalam Suffix Tree (misalnya untuk mencetak semua kata yang memiliki awalan tertentu pada fitur Autocomplete) membutuhkan waktu yang sebanding dengan jumlah node yang dikunjungi, yaitu O(m+k), di mana m adalah panjang awalan/kata dan k adalah jumlah kemunculan hasil yang ditemukan.
 - Search (Pencarian Substring): Ini adalah keunggulan utama dari Suffix Tree. Untuk mencari apakah sebuah substring ada di dalam teks, algoritma hanya perlu mengikuti cabang (edge) dari root ke bawah. Kompleksitas waktunya adalah O(m), murni bergantung pada panjang karakter yang dicari (m), tanpa memedulikan seberapa besar data di dalam kamus secara keseluruhan.
 
 #### 8.2 Kompleksitas DAWG
 DAWG adalah bentuk minimalisasi dari Suffix Tree yang mengubah struktur pohon menjadi Directed Acyclic Graph (graf berarah tak bersiklus) layaknya sebuah mesin state DFA (Deterministic Finite Automaton).
+
 - State Transition (Transisi State): Proses berpindah dari satu state ke state berikutnya saat membaca suatu karakter memiliki kompleksitas konstan O(1) (karena transisi diimplementasikan menggunakan pemetaan array berukuran 128 untuk karakter ASCII).
 - Minimization (Minimalisasi Ruang): DAWG secara otomatis melebur (merging) state-state yang memiliki sufiks atau jalur ekuivalen. Algoritma pembentukan DAWG secara linear (online algorithm dari Blumer dkk.) menjamin bahwa jumlah total state maksimal adalah 2n−1 dan jumlah transisinya maksimal 3n−4. Pembentukannya memakan waktu linear O(n).
 - Substring Recognition (Pengenalan Substring): Karena DAWG bertindak sebagai mesin automata pengenal string, mengecek keberadaan substring hanya dilakukan dengan melakukan transisi state per karakter. Kompleksitas waktunya sangat optimal, yaitu O(m), di mana m adalah panjang kata kunci yang dicari.
 
 #### 8.3 Analisis Efisiensi
 Perbandingan efisiensi keseluruhan antara Suffix Tree dan DAWG dalam proyek Smart Dictionary ini dapat disimpulkan sebagai berikut:
+
 - Search Complexity: Keduanya menawarkan tingkat efisiensi pencarian tingkat dewa sebesar O(m). Hal ini jauh melampaui kemampuan Linear Search konvensional yang membutuhkan waktu O(N×m), menjadikannya sangat ideal untuk pencarian kamus skala besar.
 - Memory Complexity: Keduanya memiliki kompleksitas ruang memori secara teoretis sebesar O(n). Namun, pada implementasi nyatanya, Suffix Tree sangat boros memori (memiliki faktor konstanta memori yang besar akibat duplikasi node pada cabang yang mirip). Sebaliknya, DAWG jauh lebih hemat dan efisien karena struktur DAG-nya mendaur ulang cabang atau sufiks yang memiliki kesamaan (efek dari state minimization).
 - Traversal Efficiency: Untuk menelusuri data dalam rangka ekstraksi kata (autocomplete), Suffix Tree sedikit lebih terstruktur karena bentuknya yang hierarkis murni (dari atas ke bawah). Sementara pada DAWG, penelusurannya juga sangat cepat (O(1) per karakter) namun alurnya membentuk graf yang padat, sehingga sangat unggul dalam melakukan validasi eksistensi (apakah kata tersebut ada atau tidak).
 
 ## 9. Potensi Pengembangan ke Depan
 
-Dikerjakan oleh: Julian
+---
 
-Isi:
+Struktur data Suffix Tree dan DAWG yang telah diimplementasikan dalam project ini memiliki potensi besar untuk dikembangkan lebih lanjut ke berbagai aplikasi nyata. Berikut adalah potensi pengembangan yang dapat dilakukan:
 
-* spell checker
-* recommendation system
-* search engine
-* NLP
-* text mining
-* autocomplete modern
+---
+
+### 9.1 Spell Checker
+
+#### Definisi Umum
+
+Spell checker adalah sistem yang mendeteksi dan mengoreksi kesalahan ejaan dalam teks. Sistem ini membutuhkan kemampuan mencocokkan kata yang salah eja dengan kata yang paling mendekati dalam kamus.
+
+#### Potensi pada Implementasi
+
+DAWG sangat cocok dijadikan fondasi spell checker karena kemampuannya menyimpan seluruh kata dalam kamus secara kompak. Pengembangan yang dapat dilakukan:
+
+- Menambahkan **Edit Distance (Levenshtein)** pada proses traversal DAWG untuk menemukan kata dengan perbedaan karakter minimal.
+- Memanfaatkan `contains()` di `DAWG.java` sebagai pengecekan awal apakah kata sudah benar sebelum masuk ke proses koreksi.
+- Mengintegrasikan kamus kata baku bahasa Indonesia ke dalam `DictionaryApp.java` sehingga sistem dapat menyarankan koreksi secara otomatis.
+
+```java
+if (!dawg.contains(inputWord)) {
+    System.out.println("Kata tidak ditemukan. Mungkin maksud Anda: ");
+}
+```
+
+---
+
+### 9.2 Recommendation System
+
+#### Definisi Umum
+
+Recommendation system adalah sistem yang menyarankan konten, produk, atau kata berdasarkan pola input pengguna. Dalam konteks teks, sistem ini dapat merekomendasikan kata atau frasa berikutnya berdasarkan histori pencarian.
+
+#### Potensi pada Implementasi
+
+Suffix Tree yang dibangun dari korpus teks besar dapat dimanfaatkan untuk merekomendasikan kata atau frasa yang sering muncul bersamaan:
+
+- Menambahkan **frekuensi kemunculan** pada setiap node `TreeNode.java` untuk mengetahui pola kata yang paling sering dicari.
+- Mengembangkan `DictionaryApp.java` agar tidak hanya mencari kata, tetapi juga merekomendasikan kata-kata terkait berdasarkan kesamaan substring.
+- Membangun sistem **co-occurrence** antar kata dalam teks menggunakan hasil traversal Suffix Tree.
+
+```java
+public class TreeNode {
+    char character;
+    HashMap<Character, TreeNode> children;
+    boolean isEnd;
+    int frequency; 
+}
+```
+
+---
+
+### 9.3 Search Engine
+
+#### Definisi Umum
+
+Search engine adalah sistem pencarian yang mampu menemukan dokumen atau informasi relevan dari koleksi data yang sangat besar secara cepat dan akurat.
+
+#### Potensi pada Implementasi 
+
+Suffix Tree yang ada pada `SuffixTree.java` sudah merupakan cikal bakal mesin pencari sederhana. Pengembangannya dapat meliputi:
+
+- Menyimpan **indeks posisi** kemunculan setiap substring dalam teks, sehingga hasil pencarian bisa menunjukkan lokasi tepat kata ditemukan.
+- Mengembangkan `Main.java` agar mampu memuat teks dari file eksternal (dokumen, artikel) dan membangun index otomatis.
+- Menambahkan **ranking relevansi** berdasarkan frekuensi kemunculan substring untuk mengurutkan hasil pencarian.
+
+```java
+public void insertSuffix(String suffix, int position) {
+    current.positions.add(position); 
+}
+```
+
+---
+
+### 9.4 NLP (Natural Language Processing)
+
+#### Definisi umum
+
+NLP adalah cabang kecerdasan buatan yang memungkinkan komputer memahami, menginterpretasikan, dan menghasilkan bahasa manusia. Banyak tugas NLP bergantung pada efisiensi pencocokan string dan analisis pola teks.
+
+#### Potensi pada Implementasi 
+
+Struktur DAWG dan Suffix Tree sangat relevan untuk berbagai tugas NLP:
+
+- **Tokenisasi** — Suffix Tree dapat digunakan untuk memecah teks menjadi token secara efisien berdasarkan pola yang tersimpan.
+- **Named Entity Recognition (NER)** — DAWG dapat menyimpan daftar entitas (nama orang, tempat, organisasi) dan mencocokkannya dengan teks input secara O(m).
+- **Stemming & Lemmatisasi** — Suffix link pada `DAWG.java` secara konseptual mirip dengan relasi antar bentuk kata, sehingga dapat diadaptasi untuk menghubungkan kata dasar dengan variasinya.
+- Mengintegrasikan DAWG dengan model bahasa sederhana untuk analisis sentimen berbasis keyword matching.
+
+---
+
+### 9.5 Text Mining
+
+#### Definisi umum
+
+Text mining adalah proses ekstraksi informasi bermakna dari teks tidak terstruktur dalam jumlah besar, meliputi pengenalan pola, klasifikasi, dan clustering teks.
+
+#### Potensi pada Implementasi 
+
+- Suffix Tree yang dibangun dari korpus besar dapat digunakan untuk menemukan **pola berulang** (repeated patterns) yang menjadi kandidat fitur penting dalam text mining.
+- Memanfaatkan `Benchmark.java` yang sudah ada untuk mengukur performa sistem saat memproses dataset teks skala besar, sebagai acuan optimasi.
+- Mengembangkan kemampuan `buildTree()` di `SuffixTree.java` agar dapat memproses input dari file atau stream data secara bertahap (incremental).
+
+```java
+public void buildFromFile(String filePath) throws IOException {
+    BufferedReader br = new BufferedReader(new FileReader(filePath));
+    String line;
+    while ((line = br.readLine()) != null) {
+        buildTree(line.toLowerCase());
+    }
+}
+```
+
+---
+
+### 9.6 Autocomplete Modern
+
+#### Definisi umum
+
+Autocomplete modern adalah fitur yang memprediksi dan melengkapi kata atau kalimat yang sedang diketik pengguna secara real-time, seperti yang ditemukan pada search bar Google, IDE, atau keyboard smartphone.
+
+#### Potensi pada Implementasi
+
+`DictionaryApp.java` sudah memiliki fitur autocomplete dasar menggunakan `startsWith()`. Pengembangan modernnya meliputi:
+
+- Mengganti implementasi `startsWith()` yang linear dengan **traversal Suffix Tree atau DAWG** sehingga autocomplete berjalan dalam O(m) meskipun kamus berisi jutaan kata.
+- Menambahkan **scoring berbasis popularitas** sehingga saran yang muncul diurutkan dari yang paling sering dipilih pengguna.
+- Mendukung **fuzzy autocomplete** — saran tetap muncul meskipun ada typo kecil dalam input, dengan memanfaatkan suffix link pada DAWG.
+- Mengembangkan antarmuka interaktif berbasis GUI atau web yang terhubung langsung ke DAWG sebagai backend indexing.
+
+```java
+public List<String> autocomplete(String prefix) {
+    List<String> results = new ArrayList<>();
+    int cur = 0;
+
+    for (char c : prefix.toCharArray()) {
+        int nxt = pool[cur].get(c);
+        if (nxt == -1) return results; 
+        cur = nxt;
+    }
+
+    collectWords(cur, new StringBuilder(prefix), results);
+    return results;
+}
+```
+
+---
+
+#### Ringkasan Potensi Pengembangan
+
+| Aplikasi | Struktur Utama | Kompleksitas | 
+|---|---|---|
+| Spell Checker | DAWG | O(m · d) 
+| Recommendation System | Suffix Tree | O(m) 
+| Search Engine | Suffix Tree | O(m) 
+| NLP | DAWG + Suffix Tree | O(m) 
+| Text Mining | Suffix Tree | O(n²) build 
+| Autocomplete Modern | DAWG | O(m) 
+
+> *m = panjang pattern/query, d = edit distance tolerance, n = panjang teks*
+
+---
+
+*Implementasi dasar tersedia di: `SuffixTree.java`, `TreeNode.java`, `DAWG.java`, `State.java`, `DictionaryApp.java`* 
+
 
 ## 10. Hasil Implementasi
 
-Dikerjakan oleh: Nazwa, Silfi, Dafa
+#### 10.1 Hasil Suffix Tree 
 
-#### 10.1 Hasil Suffix Tree (Nazwa)
+![hasil suffix tree](assets/image.png)
 
-![hasil suffix tree](image.png)
+#### 10.2 Hasil DAWG 
 
-#### 10.2 Hasil DAWG (Silfi)
+1. Hasil program dawg ketika dijalankan
 
-Masukkan:
+![alt text](assets/output1.png)
 
-* transition result
-* automata traversal
+2. Hasil program ketika menjalankan 'showstates'
 
-#### 10.3 Hasil Dictionary (Dafa)
-![opsi](image-1.png) <br>
-![opsi 1](image-3.png) <br>
-![opsi 2](image-2.png) <br>
-![opsi 3](image-4.png)
+![alt text](assets/output2.png)
+
+#### 10.3 Hasil Dictionary 
+![opsi](assets/image-1.png) <br>
+![opsi 1](assets/image-3.png) <br>
+![opsi 2](assets/image-2.png) <br>
+![opsi 3](assets/image-4.png)
 
 ## 11. Perbandingan Performa Real (Benchmark)
 
@@ -919,21 +1269,66 @@ Berdasarkan hasil pengujian di atas, dapat disimpulkan beberapa poin penting men
 
 
 ## 12. Kesimpulan
+Berdasarkan hasil implementasi dan pengujian yang telah dilakukan, dapat disimpulkan bahwa struktur data Suffix Tree dan Directed Acyclic Word Graph (DAWG) mampu meningkatkan efisiensi proses substring searching pada aplikasi Smart Dictionary dibandingkan metode pencarian linear biasa.
+ 
+Pada implementasi program, Suffix Tree berhasil dibangun menggunakan struktur node berbasis `HashMap<Character, TreeNode>` melalui class:
 
-Dikerjakan oleh: Silfi
+```java
+public class SuffixTree
+```
 
-Isi:
+Struktur tersebut memungkinkan proses traversal substring dilakukan secara cepat melalui perpindahan node berdasarkan karakter input. Seluruh suffix string dimasukkan ke dalam tree menggunakan method:
+```java
+public void buildTree(String text)
+```
+ 
+dan proses pencarian dilakukan menggunakan:
+```java
+public boolean search(String pattern)
+```
+ 
+Hasil implementasi menunjukkan bahwa Suffix Tree mampu melakukan pencarian substring dengan kompleksitas waktu:
+ 
+```java
+O(m)
+```
+ 
+di mana `m` merupakan panjang pattern yang dicari.
+ 
+Selain itu, implementasi DAWG (Directed Acyclic Word Graph) menggunakan pendekatan suffix automaton melalui class:
+ 
+```java
+public class DAWG
+```
+ 
+menunjukkan efisiensi ruang yang lebih baik dibandingkan Suffix Tree. DAWG melakukan minimisasi state menggunakan mekanisme clone state:
+ 
+```java
+int clone = newState(pool[p].len + 1, pool[q].link);
+ 
+pool[clone].copyTransitionsFrom(pool[q]);
+ 
+pool[clone].isClone = true;
+```
+ 
+Pendekatan tersebut memungkinkan state dengan transisi identik digabung sehingga redundansi substring dapat dikurangi secara signifikan.
+ 
+Berdasarkan hasil benchmark, baik Suffix Tree maupun DAWG memiliki performa pencarian yang jauh lebih cepat dibandingkan linear search karena traversal hanya bergantung pada panjang pattern, bukan jumlah keseluruhan data. Namun, DAWG memiliki keunggulan tambahan pada efisiensi memori karena menggunakan struktur automata minimal.
+ 
+Dalam implementasi Smart Dictionary, penggunaan kedua struktur data ini terbukti efektif untuk mendukung fitur modern seperti:
 
-* hasil implementasi
-* efisiensi struktur data
-* perbandingan performa
-* penggunaan tree pada smart dictionary
+*  substring searching 
+*  autocomplete 
+*  recommendation word 
+*  pencarian istilah teknologi informasi 
 
+Secara keseluruhan, proyek ini menunjukkan bahwa struktur data berbasis tree dan automata memiliki peran penting dalam pengembangan sistem pencarian modern yang membutuhkan performa tinggi dan efisiensi ruang memori.
+ 
+Menurut Gusfield (1997), suffix tree merupakan salah satu struktur paling efisien dalam pemrosesan string karena mampu melakukan substring searching secara linear. Sementara itu, Fujishige dkk. (2023) menjelaskan bahwa DAWG mampu mempertahankan efisiensi pencarian dengan jumlah state minimal melalui proses automata minimization.
+ 
+Dengan demikian, implementasi Suffix Tree dan DAWG pada Smart Dictionary berhasil memenuhi tujuan utama proyek, yaitu menciptakan sistem pencarian substring yang cepat, efisien, dan scalable untuk pengolahan data teks modern.
+ 
 ## 13. Referensi
 
-Dikerjakan oleh: Nazwa
-
-Isi:
-
-1. Paper Suffix Tree
-2. Paper DAG
+1. Faro, S., & Scafiti, S. (2023). Compact suffix automata representations for searching long patterns. Theoretical Computer Science, 940, 254–268.
+2. Fujishige, Y., Tsujimaru, Y., Inenaga, S., Bannai, H., & Takeda, M. (2023). Linear-time Computation of DAWGs, Symmetric Indexing Structures, and MAWs for Integer Alphabets. Theoretical Computer Science.
