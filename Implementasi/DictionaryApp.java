@@ -7,22 +7,29 @@ public class DictionaryApp {
         Scanner input = new Scanner(System.in);
 
         String[] words = {
-            "teknologi informasi",
-            "information technology",
-            "cyber security",
-            "internet of things",
-            "integration system",
-            "smart city"
+            "teknologi", "informasi",
+            "information", "technology",
+            "cyber", "security",
+            "internet", "of", "things",
+            "integration", "system",
+            "smart", "city"
         };
 
+    while (true) {
         System.out.println("=== IT ITS DICTIONARY ===");
         System.out.println("1. Search Word");
         System.out.println("2. Autocomplete");
         System.out.println("3. Substring Search");
-
+        System.out.println("4. Exit");
+    
         System.out.print("Pilih menu: ");
         int choice = input.nextInt();
         input.nextLine();
+
+        if (choice == 4) {
+        System.out.println("Keluar dari program...");
+        break;
+        }
 
         System.out.print("Masukkan kata: ");
         String keyword = input.nextLine();
@@ -58,8 +65,8 @@ public class DictionaryApp {
                         found = true;
                     }
                 }
-                break;
-
+                break; 
+            
             default:
                 System.out.println("Menu tidak valid");
         }
@@ -69,5 +76,6 @@ public class DictionaryApp {
         }
 
         input.close();
+    }
     }
 }
