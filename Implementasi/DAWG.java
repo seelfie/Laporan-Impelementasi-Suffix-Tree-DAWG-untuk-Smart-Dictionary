@@ -119,7 +119,7 @@ public class DAWG {
     private int countTransitions() {
         int total = 0;
         for (int i = 0; i < size; i++)
-            for (int j = 0; j < 26; j++)
+            for (int j = 0; j < 128; j++)
                 if (pool[i].next[j] != -1) total++;
         return total;
     }

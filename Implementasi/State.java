@@ -3,7 +3,7 @@ public class State {
     public int link;
     public int[] next;
     public boolean isClone;
-    private static final int ALPHA = 26;
+    private static final int ALPHA = 128;
 
     public State(int len, int link) {
         this.len     = len;
@@ -22,11 +22,13 @@ public class State {
     }
 
     public int get(char c) {
-        return next[c - 'a'];
+        if (c >= ALPHA) return -1;
+        return next[c];
     }
  
     public void put(char c, int dst) {
-        next[c - 'a'] = dst;
+        if (c >= ALPHA) return;
+        next[c] = dst;
     }
  
     @Override
@@ -36,7 +38,7 @@ public class State {
         for (int i = 0; i < ALPHA; i++) {
             if (next[i] != -1) {
                 if (!first) sb.append(", ");
-                sb.append((char)('a' + i)).append("->").append(next[i]);
+                sb.append((char)i).append("->").append(next[i]);
                 first = false;
             }
         }

@@ -1,6 +1,7 @@
 public class Benchmark {
+
     public static String[] generateWords(int count) {
-        String[] words = new String[count]; 
+        String[] words = new String[count];
         for (int i = 0; i < count; i++) {
             words[i] = "kata" + i;
         }
@@ -8,44 +9,51 @@ public class Benchmark {
     }
 
     public static boolean linearSearch(String[] words, String target) {
-        for (int i = 0; i < words.length; i++) {
-            if (words[i].equals(target)) {
-                return true;
-            }
+        for (String w : words) {
+            if (w.equals(target)) return true;
         }
         return false;
     }
 
-    public static boolean suffixStructureSearch(String target) {
-        int m = target.length();
-        for (int i = 0; i < m; i++) {
-            char c = target.charAt(i); 
-        }
-        return true;
-    }
+    public static void runBenchmark(int wordCount, SuffixTree st, DAWG dawg) {
 
-    public static void runBenchmark(int wordCount) {
         String[] dataset = generateWords(wordCount);
-        String targetWord = dataset[dataset.length - 1]; 
+        String target = dataset[dataset.length - 1];
 
-        long startTime = System.nanoTime();
-        linearSearch(dataset, targetWord);
-        long endTime = System.nanoTime();
-        long linearDuration = endTime - startTime;
+        long start = System.nanoTime();
+        linearSearch(dataset, target);
+        long linearTime = System.nanoTime() - start;
 
-        startTime = System.nanoTime();
-        suffixStructureSearch(targetWord);
-        endTime = System.nanoTime();
-        long suffixDuration = endTime - startTime;
+        start = System.nanoTime();
+        st.search(target);
+        long suffixTime = System.nanoTime() - start;
 
-        System.out.println("=== BENCHMARK SIMULASI: " + wordCount + " KATA ===");
-        System.out.println("Linear Search Time           : " + linearDuration + " ns");
-        System.out.println("Suffix Structure Search Time : " + suffixDuration + " ns");
-        System.out.println("----------------------------------------------");
+        start = System.nanoTime();
+        dawg.contains(target);
+        long dawgTime = System.nanoTime() - start;
+
+        System.out.println("=== BENCHMARK " + wordCount + " KATA ===");
+        System.out.println("Linear Search : " + linearTime + " ns");
+        System.out.println("Suffix Tree   : " + suffixTime + " ns");
+        System.out.println("DAWG          : " + dawgTime + " ns");
+        System.out.println("----------------------------------");
     }
 
     public static void main(String[] args) {
-        runBenchmark(1000);
-        runBenchmark(5000);
+
+        SuffixTree st = new SuffixTree();
+        DAWG dawg = new DAWG();
+
+        String[] data = generateWords(5000);
+
+        for (String w : data) {
+            st.buildTree(w);
+        }
+
+        dawg.reset();
+        dawg.build(String.join("", data)); 
+
+        runBenchmark(1000, st, dawg);
+        runBenchmark(5000, st, dawg);
     }
 }
